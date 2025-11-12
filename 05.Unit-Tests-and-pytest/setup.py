@@ -12,6 +12,7 @@ requires = [
 # dictionary below.
 dev_requires = [
     'pyramid_debugtoolbar',
+    'pytest',
 ]
 
 setup(
