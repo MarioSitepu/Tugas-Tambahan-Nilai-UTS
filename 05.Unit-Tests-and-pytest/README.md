@@ -1,51 +1,56 @@
-# 04: Easier Development with debugtoolbar
+# 05: Unit Tests and pytest
 
 ## Deskripsi
 
-Proyek ini mendemonstrasikan penggunaan `pyramid_debugtoolbar` untuk memudahkan proses development dan debugging aplikasi Pyramid. Debugtoolbar adalah add-on Pyramid yang menyediakan berbagai tools debugging langsung di browser, termasuk traceback yang informatif ketika terjadi error.
+Proyek ini mendemonstrasikan cara menulis unit tests untuk aplikasi Pyramid menggunakan pytest. Testing adalah praktik penting dalam pengembangan software untuk memastikan kode bekerja dengan benar dan tetap berfungsi saat dilakukan perubahan di masa depan.
 
-Sebagai bagian dari pembelajaran dasar Pyramid, tutorial ini juga memperkenalkan konsep **Setuptools extras** untuk mengelola dependencies development secara terpisah dari dependencies production.
+Sebagai bagian dari pembelajaran dasar Pyramid, tutorial ini memperkenalkan:
+- Konsep unit testing
+- Penggunaan pytest sebagai test runner
+- Pyramid testing helpers untuk memudahkan penulisan tests
+- Best practices dalam menulis tests
 
 ## Background
 
-### Error Handling dan Introspection
+### Pentingnya Testing
 
-Selama development, kita membutuhkan tools yang membantu:
-- **Error handling**: Menampilkan traceback yang jelas ketika terjadi error
-- **Introspection**: Memeriksa variabel, request, response, dan informasi debugging lainnya
-- **Development tools**: Template reloading, application reloading, dan tools lainnya
+Sebagai mantra dalam komunitas Python: **"Untested code is broken code."** Testing memastikan:
+- Kode bekerja sesuai yang diharapkan
+- Perubahan di masa depan tidak merusak fungsionalitas yang sudah ada
+- Dokumentasi hidup tentang bagaimana kode seharusnya bekerja
+- Kepercayaan diri saat melakukan refactoring
 
-### Pyramid Add-ons
+### Pyramid dan Testing
 
-`pyramid_debugtoolbar` adalah contoh dari **Pyramid add-on**, yaitu package Python yang menambahkan fungsionalitas ke aplikasi Pyramid. Add-on dapat dikonfigurasi dengan dua cara:
-1. **Imperative configuration**: Menggunakan `config.include()` di kode Python
-2. **Declarative configuration**: Menggunakan `pyramid.includes` di file `.ini`
+Pyramid memiliki komitmen yang kuat terhadap testing, dengan 100% test coverage sejak pre-release awal. Pyramid menyediakan `pyramid.testing` yang menyediakan helper functions untuk memudahkan penulisan tests.
 
-### Setuptools Extras
+### pytest vs unittest
 
-Setuptools extras memungkinkan kita mendefinisikan dependencies yang **opsional** atau **khusus untuk environment tertentu** (seperti development, testing, atau production). Ini memungkinkan:
-- Dependencies production tetap ringan
-- Dependencies development terpisah dan tidak terinstall di production
-- Fleksibilitas dalam mengelola dependencies
+Python menyediakan framework testing di standard library (`unittest`), namun pytest menyediakan:
+- Sintaks yang lebih sederhana
+- Output yang lebih informatif
+- Fixtures yang powerful
+- Plugin ecosystem yang luas
 
 ## Tujuan Pembelajaran
 
-1. Memahami cara menginstall dan mengaktifkan `pyramid_debugtoolbar`
-2. Memahami konsep Pyramid add-ons
-3. Memahami cara mengkonfigurasi add-on melalui file `.ini`
-4. Memahami konsep Setuptools extras untuk development dependencies
-5. Menggunakan debugtoolbar untuk debugging dan introspection
+1. Memahami konsep unit testing
+2. Menginstall dan menggunakan pytest
+3. Menulis unit tests untuk Pyramid views
+4. Menggunakan Pyramid testing helpers
+5. Menjalankan tests dengan pytest
 
 ## Struktur Proyek
 
 ```
-04.Easier-Development-with-debugtoolbar/
-├── setup.py                 # Setup file dengan extras_require untuk dev dependencies
-├── development.ini          # File konfigurasi dengan pyramid.includes
+05.Unit-Tests-and-pytest/
+├── setup.py                 # Setup file dengan pytest di dev_requires
+├── development.ini          # File konfigurasi aplikasi
 ├── requirements.txt         # Dependencies production
 ├── tutorial/                # Package aplikasi
-│   └── __init__.py         # Berisi fungsi main() sebagai WSGI factory
-└── tutorial.egg-info/      # Metadata package (auto-generated)
+│   ├── __init__.py         # Berisi fungsi main() dan hello_world view
+│   └── tests.py            # File unit tests
+└── tutorial.egg-info/       # Metadata package (auto-generated)
 ```
 
 ## Persyaratan
@@ -74,13 +79,7 @@ Setuptools extras memungkinkan kita mendefinisikan dependencies yang **opsional*
    source venv/bin/activate
    ```
 
-3. **Install dependencies production:**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Install package dengan development dependencies:**
+3. **Install package dengan development dependencies:**
 
    ```bash
    pip install -e ".[dev]"
@@ -93,46 +92,32 @@ Setuptools extras memungkinkan kita mendefinisikan dependencies yang **opsional*
 
    Perintah ini akan:
    - Install dependencies production (`pyramid`, `waitress`)
-   - Install dependencies development (`pyramid_debugtoolbar`)
+   - Install dependencies development (`pyramid_debugtoolbar`, `pytest`)
    - Install package `tutorial` dalam mode editable
-   - Generate folder `tutorial.egg-info/` yang berisi metadata package
 
-## Menjalankan Aplikasi
+## Menjalankan Tests
 
-1. **Jalankan dengan pserve:**
+Jalankan tests menggunakan pytest:
 
-   ```bash
-   pserve development.ini --reload
-   ```
+```bash
+pytest tutorial/tests.py -q
+```
 
-   Flag `--reload` akan:
-   - Watch filesystem untuk perubahan pada file Python dan `.ini`
-   - Otomatis restart aplikasi ketika ada perubahan
-   - Sangat berguna untuk development
+**Penjelasan perintah:**
+- `pytest`: Test runner
+- `tutorial/tests.py`: File yang berisi tests
+- `-q`: Quiet mode (output yang lebih ringkas)
 
-2. **Buka browser:**
-
-   Navigate ke: http://localhost:6543/
-
-   Anda akan melihat:
-   - Halaman dengan teks "Hello World!"
-   - **Toolbar debug di sisi kanan browser** (fitur baru dari debugtoolbar)
-
-3. **Coba fitur debugtoolbar:**
-
-   - Klik tombol toolbar di sisi kanan untuk melihat informasi debugging
-   - Coba akses variabel, request, response, dan informasi lainnya
-   - Lihat performance metrics dan SQL queries (jika ada)
-
-4. **Stop aplikasi:**
-
-   Tekan `Ctrl+C` di terminal
+**Output yang diharapkan:**
+```
+. 1 passed in 0.14 seconds
+```
 
 ## Penjelasan File
 
 ### setup.py
 
-File ini mendefinisikan package Python dengan **Setuptools extras**:
+File ini mendefinisikan package Python dengan pytest di development dependencies:
 
 ```python
 requires = [
@@ -142,6 +127,7 @@ requires = [
 
 dev_requires = [
     'pyramid_debugtoolbar',
+    'pytest',
 ]
 
 setup(
@@ -159,73 +145,62 @@ setup(
 ```
 
 **Penjelasan:**
+- **`pytest`** ditambahkan ke `dev_requires` karena hanya diperlukan untuk development/testing
+- Production environment tidak perlu menginstall pytest
 
-- **`requires`**: Dependencies yang selalu diinstall (production dependencies)
-- **`dev_requires`**: Dependencies khusus untuk development
-- **`extras_require`**: Dictionary yang mendefinisikan extras (opsional dependencies)
-  - Key `'dev'`: Nama extra
-  - Value `dev_requires`: List dependencies untuk extra tersebut
+### tutorial/tests.py
 
-**Cara menggunakan extras:**
+File ini berisi unit tests untuk aplikasi:
 
-- Install tanpa extras: `pip install -e .` (hanya install `requires`)
-- Install dengan extras dev: `pip install -e ".[dev]"` (install `requires` + `dev_requires`)
+```python
+import unittest
+from pyramid import testing
 
-**Mengapa menggunakan extras?**
 
-- Production environment tidak perlu install development tools
-- Development dependencies terpisah dan jelas
-- Fleksibilitas dalam mengelola dependencies
+class TutorialViewTests(unittest.TestCase):
+    def setUp(self):
+        self.config = testing.setUp()
 
-### development.ini
+    def tearDown(self):
+        testing.tearDown()
 
-File konfigurasi yang mengaktifkan debugtoolbar melalui `pyramid.includes`:
+    def test_hello_world(self):
+        from tutorial import hello_world
 
-```ini
-[app:main]
-use = egg:tutorial
-pyramid.includes =
-    pyramid_debugtoolbar
+        request = testing.DummyRequest()
+        response = hello_world(request)
 
-[server:main]
-use = egg:waitress#main
-listen = localhost:6543
+        self.assertEqual(response.status_code, 200)
 ```
 
 **Penjelasan:**
 
-- **`pyramid.includes`**: Directive Pyramid untuk mengaktifkan add-on
-  - Format: Multi-line list (setiap baris adalah nama add-on)
-  - `pyramid_debugtoolbar`: Nama add-on yang akan diaktifkan
+1. **`import unittest`**: Menggunakan framework testing standar Python
+2. **`from pyramid import testing`**: Import Pyramid testing helpers
+3. **`TutorialViewTests`**: Class test yang mewarisi `unittest.TestCase`
+4. **`setUp()`**: Method yang dipanggil sebelum setiap test
+   - `testing.setUp()`: Menyiapkan testing environment Pyramid
+   - Menyimpan config object untuk digunakan di tests (jika diperlukan)
+5. **`tearDown()`**: Method yang dipanggil setelah setiap test
+   - `testing.tearDown()`: Membersihkan testing environment
+6. **`test_hello_world()`**: Test method untuk view `hello_world`
+   - Import view di dalam test (bukan di top level) untuk isolasi
+   - `testing.DummyRequest()`: Membuat fake HTTP request
+   - Memanggil view dengan dummy request
+   - `assertEqual()`: Assertion untuk memverifikasi status code adalah 200
 
-**Cara kerja:**
+**Mengapa import di dalam test method?**
 
-1. Pyramid membaca `pyramid.includes` dari `.ini` file
-2. Pyramid mencari dan memanggil konfigurasi dari add-on tersebut
-3. Add-on menambahkan fungsionalitas ke aplikasi (dalam hal ini, debugtoolbar)
+Import di dalam test method memastikan:
+- **Isolasi**: Setiap test adalah unit yang independen
+- **Avoid side effects**: Import bisa menyebabkan side effects yang mempengaruhi test lain
+- **Best practice**: Setiap test harus bisa dijalankan secara independen
 
-**Alternatif: Imperative Configuration**
-
-Anda juga bisa mengaktifkan add-on di kode Python:
-
-```python
-def main(global_config, **settings):
-    config = Configurator(settings=settings)
-    config.include('pyramid_debugtoolbar')  # Aktifkan di sini
-    config.add_route('hello', '/')
-    config.add_view(hello_world, route_name='hello')
-    return config.make_wsgi_app()
-```
-
-**Keuntungan menggunakan `.ini` file:**
-
-- Tidak perlu mengubah kode untuk enable/disable toolbar
-- Mudah diaktifkan/dinonaktifkan untuk environment berbeda
-- Separation of concerns: konfigurasi terpisah dari kode
+**Catatan:** `setUp()` dan `tearDown()` sebenarnya tidak diperlukan di test ini karena kita tidak menggunakan `self.config`. Mereka hanya diperlukan jika test perlu menggunakan config object untuk menambahkan konfigurasi sebelum memanggil view.
 
 ### tutorial/__init__.py
 
-Berisi fungsi `main()` yang merupakan WSGI application factory:
+Berisi fungsi `main()` dan view `hello_world`:
 
 ```python
 from pyramid.config import Configurator
@@ -243,153 +218,159 @@ def main(global_config, **settings):
     return config.make_wsgi_app()
 ```
 
-**Tidak ada perubahan dari tutorial sebelumnya** - debugtoolbar dikonfigurasi melalui `.ini` file, bukan di kode.
+Tidak ada perubahan dari tutorial sebelumnya - ini adalah kode yang akan kita test.
 
-## Fitur Debugtoolbar
+## Konsep Penting
 
-Setelah debugtoolbar diaktifkan, Anda akan melihat:
+### Unit Testing
 
-1. **Toolbar di Browser:**
-   - Tombol di sisi kanan browser
-   - Klik untuk membuka panel debugging
+Unit testing adalah praktik menulis tests untuk unit-unit kecil dari kode (biasanya functions atau methods). Setiap test:
+- Harus independen (tidak bergantung pada test lain)
+- Harus cepat (tidak melakukan operasi yang lambat)
+- Harus deterministik (hasil yang sama setiap kali dijalankan)
+- Harus menguji satu hal pada satu waktu
 
-2. **Panel Debugging:**
-   - **Request/Response**: Informasi tentang HTTP request dan response
-   - **Variables**: Variabel dalam scope saat ini
-   - **Templates**: Template yang digunakan
-   - **Performance**: Metrics performa aplikasi
-   - **SQL**: Query database (jika menggunakan database)
-   - **History**: History request sebelumnya
+### Pyramid Testing Helpers
 
-3. **Error Traceback:**
-   - Ketika terjadi error, debugtoolbar menampilkan traceback yang informatif
-   - Dapat melihat nilai variabel di setiap level stack
-   - Dapat mengevaluasi ekspresi Python dalam konteks error
+Pyramid menyediakan `pyramid.testing` yang berisi:
+- **`testing.setUp()`**: Menyiapkan testing environment
+- **`testing.tearDown()`**: Membersihkan testing environment
+- **`testing.DummyRequest()`**: Membuat fake HTTP request untuk testing
+- **`testing.DummyResource()`**: Membuat fake resource object
+- Dan banyak lagi...
 
-## Menonaktifkan Debugtoolbar
+### pytest vs unittest
 
-Untuk menonaktifkan debugtoolbar, cukup hapus atau comment baris di `development.ini`:
+Kita menggunakan `unittest.TestCase` tapi menjalankan dengan `pytest`. Ini memungkinkan:
+- Menggunakan sintaks unittest yang familiar
+- Memanfaatkan fitur pytest (output yang lebih baik, fixtures, dll)
+- Kompatibilitas dengan kode yang sudah ada
 
-```ini
-[app:main]
-use = egg:tutorial
-# pyramid.includes =
-#     pyramid_debugtoolbar
+## Menjalankan Aplikasi
+
+Untuk menjalankan aplikasi (bukan tests):
+
+```bash
+pserve development.ini --reload
 ```
 
-Atau hapus sepenuhnya:
-
-```ini
-[app:main]
-use = egg:tutorial
-```
-
-**Tidak perlu mengubah kode Python!** Ini menunjukkan keuntungan menggunakan konfigurasi `.ini`.
-
-## Catatan Penting
-
-### HTML/CSS Injection
-
-Debugtoolbar menyuntikkan sejumlah kecil HTML/CSS ke aplikasi (tepat sebelum tag `</body>`) untuk menampilkan toolbar. Jika Anda mengalami masalah client-side yang tidak dapat dijelaskan, coba nonaktifkan debugtoolbar sementara.
-
-### Production Environment
-
-**JANGAN gunakan debugtoolbar di production!** Debugtoolbar:
-- Menampilkan informasi sensitif (variabel, stack trace, dll)
-- Menambahkan overhead performa
-- Hanya untuk development
-
-Pastikan file konfigurasi production (misalnya `production.ini`) tidak memiliki `pyramid_debugtoolbar` di `pyramid.includes`.
-
-## Troubleshooting
-
-### Error: "No module named 'pyramid_debugtoolbar'"
-
-**Solusi:** Pastikan Anda sudah menjalankan `pip install -e ".[dev]"` (dengan extras `[dev]`)
-
-### Toolbar tidak muncul di browser
-
-**Solusi:**
-1. Pastikan `pyramid.includes` di `development.ini` sudah benar
-2. Pastikan `pyramid_debugtoolbar` sudah terinstall
-3. Restart aplikasi dengan `pserve development.ini --reload`
-4. Clear cache browser
-
-### Error: "Entry point 'main' not found"
-
-**Solusi:** Pastikan `setup.py` memiliki entry point yang benar dan sudah di-install ulang dengan `pip install -e ".[dev]"`
-
-### Port sudah digunakan
-
-**Solusi:** Ubah port di `development.ini` atau stop aplikasi yang menggunakan port tersebut
-
-### Perubahan kode tidak terlihat
-
-**Solusi:** Pastikan menggunakan flag `--reload` atau restart aplikasi secara manual
+Buka browser: http://localhost:6543/
 
 ## Extra Credit Questions
 
-### 1. Mengapa pyramid_debugtoolbar ditambahkan ke dev_requires, bukan requires?
+### 1. Ubah test untuk assert status code 404
 
-**Jawaban:**
+Ubah assertion di `test_hello_world` menjadi:
 
-`pyramid_debugtoolbar` adalah tool development yang:
-- Hanya dibutuhkan saat development, tidak di production
-- Menambahkan overhead performa
-- Menampilkan informasi sensitif yang tidak boleh ada di production
+```python
+self.assertEqual(response.status_code, 404)
+```
 
-Dengan menempatkannya di `dev_requires`, kita memastikan:
-- Production environment tidak menginstall tool yang tidak diperlukan
-- Dependencies production tetap ringan
-- Clear separation antara production dan development dependencies
+Jalankan pytest lagi:
 
-### 2. Coba buat bug di aplikasi
+```bash
+pytest tutorial/tests.py -q
+```
+
+**Apa yang terjadi?**
+- Test akan fail dengan AssertionError
+- pytest akan menampilkan error message yang jelas
+- Ini menunjukkan bagaimana testing membantu menemukan masalah
+
+### 2. Tambahkan error di view dan lihat hasilnya
 
 Ubah fungsi `hello_world` menjadi:
 
 ```python
 def hello_world(request):
-    return xResponse('<body><h1>Hello World!</h1></body>')  # xResponse tidak ada
+    return Response(undefined_variable)  # Error: undefined_variable tidak ada
 ```
 
-Simpan dan refresh browser. Perhatikan:
-- Traceback yang informatif ditampilkan oleh debugtoolbar
-- Klik icon "screen" di baris terakhir traceback
-- Coba ketik variabel `request` dan `Response` di interactive console
-- Jelajahi fitur-fitur debugging lainnya
+Jalankan tests:
 
-**Apa yang bisa Anda temukan?**
-- Nilai variabel di setiap level stack
-- Request object dengan semua atributnya
-- Response object
-- Template context
-- Performance metrics
-- Dan banyak lagi!
+```bash
+pytest tutorial/tests.py -q
+```
 
-### 3. Apa perbedaan antara config.include() dan pyramid.includes?
+**Apa yang terjadi?**
+- Test akan fail dengan NameError
+- pytest menampilkan traceback yang jelas
+- Ini lebih cepat daripada reload browser dan mengeklik refresh
+
+### 3. Test response body
+
+Bagaimana cara menambahkan assertion untuk test HTML value dari response body?
 
 **Jawaban:**
 
-- **`config.include()`**: Imperative configuration di kode Python
-  - Harus mengubah kode untuk enable/disable
-  - Lebih eksplisit dan terlihat di kode
-  - Cocok untuk add-on yang selalu diperlukan
+```python
+def test_hello_world(self):
+    from tutorial import hello_world
 
-- **`pyramid.includes`**: Declarative configuration di file `.ini`
-  - Tidak perlu mengubah kode
-  - Mudah diaktifkan/dinonaktifkan untuk environment berbeda
-  - Cocok untuk add-on opsional seperti debugtoolbar
+    request = testing.DummyRequest()
+    response = hello_world(request)
 
-Kedua cara menghasilkan hasil yang sama, tapi `.ini` file memberikan fleksibilitas lebih.
+    self.assertEqual(response.status_code, 200)
+    self.assertIn(b'Hello World!', response.body)
+    # atau
+    self.assertEqual(response.body, b'<body><h1>Hello World!</h1></body>')
+```
+
+**Penjelasan:**
+- `response.body` adalah bytes (bukan string)
+- Gunakan `b'...'` untuk bytes literal
+- `assertIn()` untuk memeriksa apakah string ada di body
+- `assertEqual()` untuk memeriksa exact match
+
+### 4. Mengapa import di dalam test method?
+
+**Jawaban:**
+
+Import di dalam test method memastikan:
+- **Isolasi**: Setiap test adalah unit yang independen
+- **Avoid side effects**: Import bisa menyebabkan side effects (seperti registrasi di registry, inisialisasi global state, dll) yang mempengaruhi test lain
+- **Best practice**: Setiap test harus bisa dijalankan secara independen tanpa bergantung pada urutan eksekusi
+
+Jika kita import di top level:
+```python
+from tutorial import hello_world  # Di top level
+
+class TutorialViewTests(unittest.TestCase):
+    def test_hello_world(self):
+        # hello_world sudah diimport
+        ...
+```
+
+Masalahnya:
+- Import di top level dieksekusi saat module dimuat
+- Jika ada side effects dari import, mereka akan mempengaruhi semua tests
+- Test menjadi tidak independen
+
+## Troubleshooting
+
+### Error: "No module named 'pytest'"
+
+**Solusi:** Pastikan Anda sudah menjalankan `pip install -e ".[dev]"` (dengan extras `[dev]`)
+
+### Error: "No module named 'tutorial'"
+
+**Solusi:** Pastikan package sudah diinstall dengan `pip install -e ".[dev]"`
+
+### Tests tidak ditemukan
+
+**Solusi:** Pastikan file test memiliki prefix `test_` (untuk functions) atau class mewarisi `unittest.TestCase`
+
+### Import error di test
+
+**Solusi:** Pastikan Anda menjalankan pytest dari root directory project, atau gunakan `python -m pytest`
 
 ## Referensi
 
-- [Pyramid Documentation - Debugtoolbar](https://docs.pylonsproject.org/projects/pyramid-debugtoolbar/en/latest/)
-- [Pyramid Documentation - Configuration](https://docs.pylonsproject.org/projects/pyramid/en/latest/)
-- [Setuptools Extras](https://setuptools.readthedocs.io/en/latest/userguide/declarative_config.html#options)
-- [Pyramid Add-ons](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/extending.html)
+- [Pyramid Documentation - Testing](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/testing.html)
+- [pytest Documentation](https://docs.pytest.org/)
+- [Python unittest Documentation](https://docs.python.org/3/library/unittest.html)
+- [Pyramid Testing API](https://docs.pylonsproject.org/projects/pyramid/en/latest/api/testing.html)
 
 ## Lisensi
 
 Proyek ini dibuat untuk tujuan pembelajaran berdasarkan Pyramid Quick Tutorial.
-
