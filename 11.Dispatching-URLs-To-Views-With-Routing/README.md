@@ -336,7 +336,9 @@ Pyramid mendukung berbagai tipe parameter dalam route:
 - Integer: `{id:\d+}` (hanya angka)
 - Custom regex: `{slug:[a-z-]+}` (hanya huruf kecil dan dash)
 
-## Kesimpulan
+## Analisis
+
+### Kesimpulan
 
 Dengan menggunakan routing dengan replacement patterns:
 1. **Flexibility:** URL dapat mengandung data yang dinamis
@@ -346,8 +348,32 @@ Dengan menggunakan routing dengan replacement patterns:
 
 Routing adalah fitur fundamental dalam Pyramid yang memungkinkan kita untuk membuat aplikasi web yang powerful dan fleksibel.
 
+## Troubleshooting
+
+### Error: Route not found
+
+**Solusi:** Pastikan route sudah didaftarkan sebelum `config.scan()` dipanggil.
+
+### Error: KeyError saat mengakses matchdict
+
+**Solusi:** Pastikan parameter yang diperlukan ada dalam URL. Cek bahwa route pattern sesuai dengan URL yang diakses.
+
+### Error: 404 Not Found
+
+**Solusi:** 
+- Pastikan URL sesuai dengan route pattern
+- Pastikan semua parameter yang diperlukan disediakan
+- Cek bahwa route sudah didaftarkan dengan benar
+
+### Error: Parameter tidak ter-ekstrak dengan benar
+
+**Solusi:** Pastikan route pattern menggunakan curly braces `{}` untuk replacement patterns, bukan tanda kurung `()`.
+
 ## Referensi
 
 - [Pyramid Documentation - URL Dispatch](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/urldispatch.html)
 - [Pyramid Documentation - Route Patterns](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/urldispatch.html#route-patterns)
 
+## Lisensi
+
+Proyek ini dibuat untuk tujuan pembelajaran berdasarkan Pyramid Quick Tutorial.

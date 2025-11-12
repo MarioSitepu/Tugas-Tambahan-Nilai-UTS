@@ -254,19 +254,31 @@ Ya, Anda bisa melakukan ini dengan Python code saja tanpa `.ini` file. Namun, me
 ### Perubahan kode tidak terlihat
 **Solusi:** Pastikan menggunakan flag `--reload` atau restart aplikasi secara manual
 
-## Extra Credit Questions
+## Extra Credit
 
-1. **Jika tidak suka konfigurasi dan/atau file .ini, bisakah dilakukan dengan Python code saja?**
-   Ya, bisa. Tapi `.ini` file memberikan fleksibilitas untuk mengubah konfigurasi tanpa mengubah kode.
+### 1. Jika tidak suka konfigurasi dan/atau file .ini, bisakah dilakukan dengan Python code saja?
 
-2. **Bisakah memiliki multiple file .ini untuk satu proyek? Mengapa mungkin ingin melakukan itu?**
-   Ya, bisa. Berguna untuk environment berbeda (development, production, testing) dengan konfigurasi berbeda seperti port, database, logging level, dll.
+**Jawaban:**
 
-3. **Entry point di setup.py tidak menyebutkan __init__.py saat mendeklarasikan fungsi tutorial:main. Mengapa?**
-   Karena Python otomatis mencari di `__init__.py` ketika mengimpor package. `tutorial:main` secara otomatis merujuk ke `tutorial/__init__.py:main`.
+Ya, bisa. Tapi `.ini` file memberikan fleksibilitas untuk mengubah konfigurasi tanpa mengubah kode.
 
-4. **Apa tujuan dari **settings? Apa yang ditandakan oleh **?**
-   `**settings` adalah unpacking operator yang mengubah dictionary menjadi keyword arguments. Ini memungkinkan fungsi menerima settings dari `.ini` file sebagai named parameters.
+### 2. Bisakah memiliki multiple file .ini untuk satu proyek? Mengapa mungkin ingin melakukan itu?
+
+**Jawaban:**
+
+Ya, bisa. Berguna untuk environment berbeda (development, production, testing) dengan konfigurasi berbeda seperti port, database, logging level, dll.
+
+### 3. Entry point di setup.py tidak menyebutkan __init__.py saat mendeklarasikan fungsi tutorial:main. Mengapa?
+
+**Jawaban:**
+
+Karena Python otomatis mencari di `__init__.py` ketika mengimpor package. `tutorial:main` secara otomatis merujuk ke `tutorial/__init__.py:main`.
+
+### 4. Apa tujuan dari **settings? Apa yang ditandakan oleh **?
+
+**Jawaban:**
+
+`**settings` adalah unpacking operator yang mengubah dictionary menjadi keyword arguments. Ini memungkinkan fungsi menerima settings dari `.ini` file sebagai named parameters.
 
 ## Referensi
 

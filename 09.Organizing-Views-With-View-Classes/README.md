@@ -415,8 +415,29 @@ Dengan menggunakan view classes:
 
 View classes adalah pola yang powerful dalam Pyramid untuk mengorganisir views yang kompleks. Dalam tutorial selanjutnya, kita akan melihat lebih dalam tentang view classes dan fitur-fitur lanjutannya.
 
+## Troubleshooting
+
+### Error: View class tidak ditemukan
+
+**Solusi:** Pastikan `config.scan('.views')` dipanggil setelah routes didaftarkan.
+
+### Error: Method tidak terdaftar sebagai view
+
+**Solusi:** Pastikan method memiliki `@view_config` decorator. Pastikan juga decorator berada tepat di atas method definition.
+
+### Error: Default renderer tidak bekerja
+
+**Solusi:** Pastikan `@view_defaults` decorator berada tepat di atas class definition. Pastikan juga renderer yang didefinisikan ada.
+
+### Error: Request tidak dapat diakses di method
+
+**Solusi:** Pastikan `__init__(self, request)` menerima request dan menyimpannya sebagai `self.request`.
+
 ## Referensi
 
 - [Pyramid Documentation - View Classes](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/views.html#view-classes)
 - [Pyramid Documentation - @view_defaults](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/views.html#view-defaults)
 
+## Lisensi
+
+Proyek ini dibuat untuk tujuan pembelajaran berdasarkan Pyramid Quick Tutorial.

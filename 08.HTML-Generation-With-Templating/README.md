@@ -320,7 +320,9 @@ def test_home(self):
 - Fokus pada kontrak data
 - Tidak tergantung pada format HTML
 
-## Kesimpulan
+## Analisis
+
+### Kesimpulan
 
 Dengan menggunakan templating:
 1. **Pemisahan Concerns:** Logika bisnis terpisah dari presentasi
@@ -331,9 +333,30 @@ Dengan menggunakan templating:
 
 Templating adalah best practice dalam pengembangan web modern dan Pyramid menyediakan dukungan yang kuat untuk berbagai template engine.
 
+## Troubleshooting
+
+### Error: Template not found
+
+**Solusi:** Pastikan template file berada di package yang sama dengan views atau dalam folder templates yang dikonfigurasi.
+
+### Error: Variable not found in template
+
+**Solusi:** Pastikan view mengembalikan dictionary dengan key yang sesuai dengan variable yang digunakan di template.
+
+### Error: Template tidak reload
+
+**Solusi:** Pastikan `pyramid.reload_templates = true` di `development.ini` atau restart aplikasi setelah mengubah template.
+
+### Error: Syntax error di template
+
+**Solusi:** Cek syntax Chameleon template. Pastikan menggunakan `${variable}` untuk interpolasi variabel.
+
 ## Referensi
 
 - [Pyramid Documentation - Renderers](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/renderers.html)
 - [Chameleon Documentation](https://chameleon.readthedocs.io/)
 - [Zope Page Templates](https://zope.readthedocs.io/en/latest/zopebook/ZPT.html)
 
+## Lisensi
+
+Proyek ini dibuat untuk tujuan pembelajaran berdasarkan Pyramid Quick Tutorial.

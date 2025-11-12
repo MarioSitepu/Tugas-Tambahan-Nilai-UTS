@@ -295,12 +295,32 @@ Pyramid's JSON renderer menggunakan base Python JSON encoder, sehingga mewarisi 
 - Data yang sama dapat di-render dengan berbagai renderer
 - Memudahkan testing dan pemisahan concerns
 
-## Langkah Selanjutnya
+## Analisis
+
+### Langkah Selanjutnya
 
 - Pelajari cara membuat custom renderer
 - Pelajari cara menggunakan view predicates untuk routing berdasarkan Accept header
 - Pelajari cara menangani DateTime dan objek Python lainnya dalam JSON response
 - Pelajari cara menggunakan JSON renderer dengan AJAX di frontend
+
+## Troubleshooting
+
+### Error: JSON renderer not found
+
+**Solusi:** JSON renderer adalah built-in renderer Pyramid. Pastikan tidak ada konfigurasi yang salah yang menonaktifkannya.
+
+### Error: Object not JSON serializable
+
+**Solusi:** Pastikan data yang dikembalikan view dapat di-serialize ke JSON. Gunakan dictionary dengan nilai yang dapat di-serialize (string, int, float, list, dict, bool, None).
+
+### Error: Content-Type tidak benar
+
+**Solusi:** JSON renderer secara otomatis mengatur Content-Type menjadi `application/json`. Jika tidak, pastikan tidak ada konfigurasi yang mengoverride ini.
+
+### Error: Stacking decorator tidak bekerja
+
+**Solusi:** Pastikan decorators di-stack dengan benar. Urutan decorator penting - decorator pertama akan didaftarkan terlebih dahulu.
 
 ## Referensi
 
@@ -308,3 +328,6 @@ Pyramid's JSON renderer menggunakan base Python JSON encoder, sehingga mewarisi 
 - [Pyramid JSON Renderer](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/renderers.html#json-renderer)
 - [View Configuration](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/viewconfig.html)
 
+## Lisensi
+
+Proyek ini dibuat untuk tujuan pembelajaran berdasarkan Pyramid Quick Tutorial.

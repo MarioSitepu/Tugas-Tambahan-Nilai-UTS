@@ -1,40 +1,111 @@
 # 15: More With View Classes
 
-Group views into a class, sharing configuration, state, and logic.
+## Deskripsi
+
+Proyek ini mendemonstrasikan fitur lanjutan dari view classes dalam Pyramid, termasuk penggunaan view predicates untuk dispatch multiple views berdasarkan request method dan parameter form. Tutorial ini memperlihatkan bagaimana mengorganisir views yang terkait ke dalam satu class dengan berbagi konfigurasi, state, dan logika.
+
+Sebagai bagian dari pembelajaran dasar Pyramid, tutorial ini memperkenalkan:
+- Menggunakan view predicates untuk dispatch multiple views
+- Menggunakan `request_method` predicate untuk membedakan GET dan POST
+- Menggunakan `request_param` predicate untuk membedakan form submissions
+- Berbagi state dan property dalam view class
+- Menggunakan `request.route_url()` untuk generate URL secara dinamis
 
 ## Background
 
-As part of its mission to help build more ambitious web applications, Pyramid provides many more features for views and view classes.
+### View Predicates dalam Pyramid
 
-The Pyramid documentation discusses views as a Python "callable". This callable can be a function, an object with a `__call__`, or a Python class. In this last case, methods on the class can be decorated with `@view_config` to register the class methods with the configurator as a view.
+Pyramid menyediakan **view predicates** yang menentukan view mana yang cocok dengan request berdasarkan berbagai faktor seperti:
+- HTTP method (GET, POST, PUT, DELETE, dll)
+- Parameter form (field names dalam form)
+- Header HTTP
+- Dan banyak lagi
 
-At first, our views were simple, free-standing functions. Many times your views are related: different ways to look at or work on the same data, or a REST API that handles multiple operations. Grouping these together as a view class makes sense:
+View predicates memberikan banyak fleksibilitas dalam menentukan view mana yang akan digunakan untuk request tertentu.
 
-- Group views.
-- Centralize some repetitive defaults.
-- Share some state and helpers.
+### View Classes untuk Views yang Terkait
 
-Pyramid views have view predicates that determine which view is matched to a request, based on factors such as the request method, the form parameters, and so on. These predicates provide many axes of flexibility.
+Banyak kali views Anda saling terkait: cara berbeda untuk melihat atau bekerja dengan data yang sama, atau REST API yang menangani multiple operations. Mengelompokkan views ini ke dalam view class masuk akal karena:
 
-The following shows a simple example with four operations: view a home page which leads to a form, save a change, and press the delete button.
+- **Mengelompokkan views:** Views yang terkait dikelompokkan bersama
+- **Memusatkan konfigurasi default:** Menggunakan `@view_defaults` untuk konfigurasi default di level class
+- **Berbagi state dan helpers:** State dan helper methods dapat dibagikan antar views dalam class yang sama
 
-## Objectives
+### Python Property dalam View Class
 
-- Group related views into a view class.
-- Centralize configuration with class-level `@view_defaults`.
-- Dispatch one route/URL to multiple views based on request data.
-- Share states and logic between views and templates via the view class.
+Python `@property` memungkinkan kita untuk mendefinisikan computed attributes yang dapat diakses seperti attribute biasa, bukan method. Ini berguna untuk membuat computed values yang tersedia dalam view methods dan templates.
 
-## Steps
+## Tujuan Pembelajaran
 
-First we copy the results of the templating step:
+1. Memahami konsep view predicates dalam Pyramid
+2. Menggunakan `request_method` predicate untuk membedakan GET dan POST requests
+3. Menggunakan `request_param` predicate untuk membedakan form submissions
+4. Menggunakan Python `@property` dalam view class
+5. Menggunakan `request.route_url()` untuk generate URL secara dinamis
+6. Berbagi state dan computed values antar views dalam view class
 
-```bash
-cd ..; cp -r templating more_view_classes; cd more_view_classes
-$VENV/bin/pip install -e .
+## Struktur Proyek
+
+```
+15.More-With-View-Classes/
+├── setup.py                 # Setup file dengan dependencies
+├── development.ini          # File konfigurasi aplikasi
+├── requirements.txt         # Dependencies production
+├── tutorial/                # Package aplikasi
+│   ├── __init__.py          # Konfigurasi aplikasi dengan route
+│   ├── views.py             # View class dengan multiple views dan predicates
+│   ├── home.pt              # Template untuk home view
+│   ├── hello.pt             # Template untuk hello view dengan form
+│   ├── edit.pt              # Template untuk edit view
+│   ├── delete.pt            # Template untuk delete view
+│   └── tests.py             # Tests untuk view class
+└── tutorial.egg-info/       # Metadata package (auto-generated)
 ```
 
-Our route in `more_view_classes/tutorial/__init__.py` needs some replacement patterns:
+## Persyaratan
+
+- Python 3.6 atau lebih baru
+- pip (Python package manager)
+- Virtual environment (disarankan)
+
+## Instalasi
+
+1. **Buat virtual environment (jika belum ada):**
+
+   ```bash
+   python -m venv venv
+   ```
+
+2. **Aktifkan virtual environment:**
+
+   **Windows:**
+   ```bash
+   venv\Scripts\activate
+   ```
+
+   **Linux/Mac:**
+   ```bash
+   source venv/bin/activate
+   ```
+
+3. **Install package dengan development dependencies:**
+
+   ```bash
+   pip install -e ".[dev]"
+   ```
+
+   Atau install secara terpisah:
+
+   ```bash
+   pip install -e .
+   pip install pyramid_debugtoolbar pytest webtest
+   ```
+
+## Konfigurasi
+
+### tutorial/__init__.py
+
+File `__init__.py` mendefinisikan routes dengan replacement patterns:
 
 ```python
 from pyramid.config import Configurator
@@ -49,7 +120,14 @@ def main(global_config, **settings):
     return config.make_wsgi_app()
 ```
 
-Our `more_view_classes/tutorial/views.py` now has a view class with several views:
+**Penjelasan:**
+- `config.add_route('home', '/')`: Route untuk home view
+- `config.add_route('hello', '/howdy/{first}/{last}')`: Route dengan replacement patterns untuk hello view
+- `{first}` dan `{last}` adalah placeholder yang akan diekstrak dari URL
+
+### tutorial/views.py
+
+File `views.py` berisi view class dengan multiple views dan view predicates:
 
 ```python
 from pyramid.view import (
@@ -74,26 +152,60 @@ class TutorialViews:
     def home(self):
         return {'page_title': 'Home View'}
 
-    # Retrieving /howdy/first/last the first time
     @view_config(renderer='hello.pt')
     def hello(self):
         return {'page_title': 'Hello View'}
 
-    # Posting to /howdy/first/last via the "Edit" submit button
     @view_config(request_method='POST', renderer='edit.pt')
     def edit(self):
         new_name = self.request.params['new_name']
         return {'page_title': 'Edit View', 'new_name': new_name}
 
-    # Posting to /howdy/first/last via the "Delete" submit button
     @view_config(request_method='POST', request_param='form.delete',
                  renderer='delete.pt')
     def delete(self):
-        print ('Deleted')
+        print('Deleted')
         return {'page_title': 'Delete View'}
 ```
 
-Our primary view needs a template at `more_view_classes/tutorial/home.pt`:
+**Penjelasan:**
+- `@view_defaults(route_name='hello')`: Konfigurasi default untuk semua methods, menggunakan route `hello`
+- `self.view_name`: State yang dibagikan antar views
+- `@property full_name`: Computed property yang mengakses data dari URL
+- `@view_config(route_name='home', renderer='home.pt')`: Override default untuk home view
+- `@view_config(renderer='hello.pt')`: Hello view menggunakan default route `hello`
+- `@view_config(request_method='POST', renderer='edit.pt')`: Edit view hanya cocok dengan POST requests
+- `@view_config(request_method='POST', request_param='form.delete', renderer='delete.pt')`: Delete view hanya cocok dengan POST requests yang memiliki parameter `form.delete`
+
+## Penggunaan
+
+### Menjalankan Aplikasi
+
+1. **Jalankan server development:**
+
+   ```bash
+   pserve development.ini --reload
+   ```
+
+2. **Akses aplikasi di browser:**
+
+   - Home: http://localhost:6543/
+   - Hello: http://localhost:6543/howdy/jane/doe
+
+3. **Uji fungsionalitas:**
+
+   - Klik link di home page untuk menuju hello view
+   - Isi form dan klik "Save" untuk melihat edit view
+   - Klik "Delete" untuk melihat delete view
+   - Perhatikan output di console window
+
+## Penjelasan File
+
+### Template Files
+
+#### tutorial/home.pt
+
+Template untuk home view dengan link ke hello view:
 
 ```html
 <!DOCTYPE html>
@@ -110,7 +222,13 @@ Our primary view needs a template at `more_view_classes/tutorial/home.pt`:
 </html>
 ```
 
-Ditto for our other view from the previous section at `more_view_classes/tutorial/hello.pt`:
+**Penjelasan:**
+- `${view.view_name}`: Mengakses state dari view class
+- `${request.route_url('hello', first='jane', last='doe')}`: Generate URL untuk route `hello` dengan parameter
+
+#### tutorial/hello.pt
+
+Template untuk hello view dengan form:
 
 ```html
 <!DOCTYPE html>
@@ -131,7 +249,14 @@ Ditto for our other view from the previous section at `more_view_classes/tutoria
 </html>
 ```
 
-We have an edit view that also needs a template at `more_view_classes/tutorial/edit.pt`:
+**Penjelasan:**
+- `${view.full_name}`: Mengakses property dari view class (tidak perlu `()` karena adalah property)
+- `${request.current_route_url()}`: Generate URL untuk route saat ini
+- Form memiliki dua submit buttons dengan nama berbeda (`form.edit` dan `form.delete`)
+
+#### tutorial/edit.pt
+
+Template untuk edit view:
 
 ```html
 <!DOCTYPE html>
@@ -146,7 +271,9 @@ We have an edit view that also needs a template at `more_view_classes/tutorial/e
 </html>
 ```
 
-And finally the delete view's template at `more_view_classes/tutorial/delete.pt`:
+#### tutorial/delete.pt
+
+Template untuk delete view:
 
 ```html
 <!DOCTYPE html>
@@ -160,7 +287,11 @@ And finally the delete view's template at `more_view_classes/tutorial/delete.pt`
 </html>
 ```
 
-Our tests in `more_view_classes/tutorial/tests.py` fail, so let's modify them:
+## Testing
+
+### tutorial/tests.py
+
+File `tests.py` berisi unit tests dan functional tests:
 
 ```python
 import unittest
@@ -197,67 +328,204 @@ class TutorialFunctionalTests(unittest.TestCase):
         self.assertIn(b'TutorialViews - Home View', res.body)
 ```
 
-Now run the tests:
+### Menjalankan Tests
 
 ```bash
-$VENV/bin/pytest tutorial/tests.py -q
-..
+pytest tutorial/tests.py -q
+```
+
+Output yang diharapkan:
+```
+.. 
 2 passed in 0.40 seconds
 ```
 
-Run your Pyramid application with:
+## Analisis
 
-```bash
-$VENV/bin/pserve development.ini --reload
-```
+### View Predicates
 
-Open http://localhost:6543/howdy/jane/doe in your browser. Click the Save and Delete buttons, and watch the output in the console window.
+Dalam tutorial ini, kita melihat bagaimana view predicates digunakan untuk menentukan view mana yang cocok dengan request:
 
-## Analysis
+1. **Home View:** Cocok dengan route `home` (GET request ke `/`)
+2. **Hello View:** Cocok dengan route `hello` (GET request ke `/howdy/{first}/{last}`)
+3. **Edit View:** Cocok dengan route `hello` dan POST request (tanpa parameter khusus)
+4. **Delete View:** Cocok dengan route `hello`, POST request, dan parameter `form.delete`
 
-As you can see, the four views are logically grouped together. Specifically:
+### View Predicate Priority
 
-- We have a home view available at http://localhost:6543/ with a clickable link to the hello view.
-- The second view is returned when you go to `/howdy/jane/doe`. This URL is mapped to the hello route that we centrally set using the optional `@view_defaults`.
-- The third view is returned when the form is submitted with a POST method. This rule is specified in the `@view_config` for that view.
-- The fourth view is returned when clicking on a button such as `<input type="submit" name="form.delete" value="Delete"/>`.
+Ketika multiple views cocok dengan request yang sama, Pyramid menggunakan **predicate priority** untuk menentukan view mana yang akan digunakan. Dalam kasus ini:
 
-In this step we show, using the following information as criteria, how to decide which view to use:
+- Delete view memiliki predicate yang lebih spesifik (`request_param='form.delete'`) daripada edit view
+- Ketika form di-submit dengan button "Delete", delete view akan dipilih
+- Ketika form di-submit dengan button "Save", edit view akan dipilih
 
-- Method of the HTTP request (GET, POST, etc.)
-- Parameter information in the request (submitted form field names)
+### Berbagi State dan Property
 
-We also centralize part of the view configuration to the class level with `@view_defaults`, then in one view, override that default just for that one view. Finally, we put this commonality between views to work in the view class by sharing:
+View class memungkinkan kita untuk berbagi:
+- **State:** `self.view_name` yang diassign di `__init__`
+- **Computed values:** `@property full_name` yang dihitung dari URL parameters
 
-- State assigned in `TutorialViews.__init__`
-- A computed value
+State dan property ini kemudian tersedia baik dalam view methods maupun templates (misalnya `${view.view_name}` dan `${view.full_name}`).
 
-These are then available both in the view methods and in the templates (e.g., `${view.view_name}` and `${view.full_name}`).
+### URL Generation
 
-As a note, we made a switch in our templates on how we generate URLs. We previously hardcoded the URLs, such as:
+Dalam tutorial ini, kita beralih dari hardcoded URLs ke URL generation menggunakan `request.route_url()`:
 
+**Sebelum:**
 ```html
 <a href="/howdy/jane/doe">Howdy</a>
 ```
 
-In `home.pt` we switched to:
-
+**Sesudah:**
 ```html
-<a href="${request.route_url('hello', first='jane',
-    last='doe')}">form</a>
+<a href="${request.route_url('hello', first='jane', last='doe')}">form</a>
 ```
 
-Pyramid has rich facilities to help generate URLs in a flexible, non-error prone fashion.
+**Keuntungan:**
+- URLs di-generate secara dinamis berdasarkan route name
+- Tidak perlu hardcode URLs
+- Lebih fleksibel dan tidak mudah error
+- Jika route berubah, URLs otomatis terupdate
+
+## Konsep Penting
+
+### 1. View Predicates
+
+View predicates menentukan view mana yang cocok dengan request berdasarkan berbagai faktor:
+- `request_method`: HTTP method (GET, POST, PUT, DELETE, dll)
+- `request_param`: Parameter form atau query string
+- `header`: HTTP headers
+- Dan banyak lagi
+
+### 2. View Predicate Priority
+
+Ketika multiple views cocok dengan request yang sama, Pyramid menggunakan predicate priority:
+- Predicates yang lebih spesifik memiliki priority lebih tinggi
+- View dengan predicate yang lebih spesifik akan dipilih
+
+### 3. Python Property
+
+Python `@property` memungkinkan kita untuk mendefinisikan computed attributes:
+- Dapat diakses seperti attribute biasa (tidak perlu `()`)
+- Dihitung setiap kali diakses
+- Dapat digunakan dalam view methods dan templates
+
+### 4. URL Generation
+
+Pyramid menyediakan berbagai cara untuk generate URLs:
+- `request.route_url()`: Generate absolute URL
+- `request.route_path()`: Generate relative path
+- `request.current_route_url()`: Generate URL untuk route saat ini
 
 ## Extra Credit
 
-1. Why could our template do `${view.full_name}` and not have to do `${view.full_name()}`?
+### 1. Mengapa template dapat menggunakan `${view.full_name}` tanpa `()`?
 
-2. The edit and delete views are both receive POST requests. Why does the edit view configuration not catch the POST used by delete?
+**Jawaban:**
 
-3. We used Python `@property` on `full_name`. If we reference this many times in a template or view code, it would re-compute this every time. Does Pyramid provide something that will cache the initial computation on a property?
+`full_name` adalah Python `@property`, bukan method. Property dapat diakses seperti attribute biasa tanpa perlu memanggil dengan `()`. Template engine Chameleon secara otomatis mengenali property dan mengaksesnya sebagai attribute.
 
-4. Can you associate more than one route with the same view?
+**Contoh:**
+```python
+@property
+def full_name(self):
+    return first + ' ' + last
+```
 
-5. There is also a `request.route_path` API. How does this differ from `request.route_url`?
+Dalam template:
+```html
+${view.full_name}  # Benar - property
+${view.full_name()}  # Salah - bukan method
+```
 
+### 2. Edit dan delete views keduanya menerima POST requests. Mengapa edit view configuration tidak menangkap POST yang digunakan oleh delete?
+
+**Jawaban:**
+
+Delete view memiliki predicate yang lebih spesifik (`request_param='form.delete'`) daripada edit view. Pyramid menggunakan **predicate priority** untuk menentukan view mana yang cocok:
+
+- Delete view: `request_method='POST'` AND `request_param='form.delete'`
+- Edit view: `request_method='POST'` (tanpa predicate tambahan)
+
+Ketika form di-submit dengan button "Delete" (yang memiliki `name="form.delete"`), delete view akan dipilih karena memiliki predicate yang lebih spesifik.
+
+### 3. Kita menggunakan Python `@property` pada `full_name`. Jika kita mereferensinya banyak kali dalam template atau view code, apakah akan dihitung ulang setiap kali? Apakah Pyramid menyediakan sesuatu untuk cache komputasi awal pada property?
+
+**Jawaban:**
+
+Ya, `@property` akan dihitung ulang setiap kali diakses. Jika kita ingin cache hasil komputasi, kita dapat menggunakan beberapa pendekatan:
+
+**Pendekatan 1: Cache di instance variable**
+```python
+@property
+def full_name(self):
+    if not hasattr(self, '_full_name'):
+        first = self.request.matchdict['first']
+        last = self.request.matchdict['last']
+        self._full_name = first + ' ' + last
+    return self._full_name
+```
+
+**Pendekatan 2: Compute di `__init__`**
+```python
+def __init__(self, request):
+    self.request = request
+    first = request.matchdict.get('first', '')
+    last = request.matchdict.get('last', '')
+    self.full_name = first + ' ' + last
+```
+
+Pyramid tidak menyediakan mekanisme khusus untuk caching property, jadi kita perlu mengimplementasikannya sendiri jika diperlukan.
+
+### 4. Bisakah kita mengasosiasikan lebih dari satu route dengan view yang sama?
+
+**Jawaban:**
+
+Ya, kita dapat menggunakan multiple `@view_config` decorators pada satu method untuk mengasosiasikannya dengan multiple routes:
+
+```python
+@view_config(route_name='home')
+@view_config(route_name='home_alt')
+def home(self):
+    return {'page_title': 'Home View'}
+```
+
+Method `home` akan tersedia pada kedua route: `home` dan `home_alt`.
+
+### 5. Ada juga `request.route_path` API. Bagaimana ini berbeda dari `request.route_url`?
+
+**Jawaban:**
+
+- **`request.route_url()`**: Generate **absolute URL** (termasuk scheme, host, dan port)
+  - Contoh: `http://localhost:6543/howdy/jane/doe`
+  
+- **`request.route_path()`**: Generate **relative path** (hanya path, tanpa scheme dan host)
+  - Contoh: `/howdy/jane/doe`
+
+**Kapan menggunakan masing-masing:**
+- Gunakan `route_url()` untuk links external, emails, atau APIs
+- Gunakan `route_path()` untuk links internal dalam aplikasi yang sama (lebih cepat dan tidak bergantung pada host)
+
+## Troubleshooting
+
+### Error: View not found
+
+**Solusi:** Pastikan view predicates sesuai dengan request yang dikirim. Cek request method dan parameters.
+
+### Error: Property tidak dapat diakses di template
+
+**Solusi:** Pastikan property didefinisikan dengan `@property` decorator dan tidak memerlukan parameter.
+
+### Error: URL generation error
+
+**Solusi:** Pastikan semua parameter yang diperlukan untuk route sudah disediakan dalam `route_url()` atau `route_path()`.
+
+## Referensi
+
+- [Pyramid Documentation - View Predicates](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/viewconfig.html#view-predicates)
+- [Pyramid Documentation - View Classes](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/views.html#view-classes)
+- [Pyramid Documentation - URL Generation](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/urldispatch.html#generating-routes)
+
+## Lisensi
+
+Proyek ini dibuat untuk tujuan pembelajaran berdasarkan Pyramid Quick Tutorial.

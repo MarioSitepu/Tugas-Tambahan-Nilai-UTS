@@ -309,7 +309,7 @@ pserve development.ini --reload
 
 Buka browser: http://localhost:6543/
 
-## Extra Credit Questions
+## Extra Credit
 
 ### 1. Mengapa functional tests menggunakan `b''` (byte string)?
 

@@ -332,9 +332,48 @@ Kita dapat menguji multiple views dengan:
 
 Ketiga hal ini dapat berbeda, memberikan fleksibilitas dalam organisasi kode.
 
-## Pertanyaan Extra Credit
+## Analisis
+
+### Perbedaan dari Tutorial Sebelumnya
+
+1. **Views Dipisahkan:** Views sekarang berada di modul terpisah (`views.py`)
+2. **Konfigurasi Deklaratif:** Menggunakan `@view_config` decorator
+3. **Config.scan():** Menggunakan `config.scan()` untuk menemukan views
+4. **Multiple Views:** Memiliki dua views (home dan hello)
+5. **Routing Berbeda:** Setiap view memiliki route dan URL yang berbeda
+
+### Keuntungan Pendekatan Ini
+
+1. **Organisasi Kode:** Views terpisah dari kode startup
+2. **Mudah Dibaca:** Konfigurasi deklaratif lebih mudah dipahami
+3. **Skalabilitas:** Mudah menambahkan views baru
+4. **Maintainability:** Lebih mudah memelihara kode
+
+### Nama Route vs URL vs View Function
+
+- **Route Name:** `home`, `hello` (nama internal untuk routing)
+- **URL:** `/`, `/howdy` (URL yang diakses user)
+- **View Function:** `home()`, `hello()` (nama function)
+
+Ketiga hal ini dapat berbeda, memberikan fleksibilitas dalam organisasi kode.
+
+### Kesimpulan
+
+Tutorial ini memperkenalkan konsep penting dalam Pyramid:
+
+1. **Memisahkan Views:** Views dapat dipisahkan ke modul terpisah
+2. **Konfigurasi Deklaratif:** Menggunakan `@view_config` decorator
+3. **Config.scan():** Menggunakan `config.scan()` untuk menemukan views
+4. **Multiple Views:** Membuat multiple views dengan routing yang berbeda
+5. **Testing:** Menguji multiple views dengan unit tests dan functional tests
+
+Konsep-konsep ini merupakan dasar untuk membangun aplikasi Pyramid yang lebih kompleks dan terorganisir dengan baik.
+
+## Extra Credit
 
 ### 1. Apa arti titik (`.`) dalam `.views`?
+
+**Jawaban:**
 
 Titik (`.`) dalam `.views` berarti modul relatif terhadap package saat ini. Jadi:
 
@@ -344,6 +383,8 @@ Titik (`.`) dalam `.views` berarti modul relatif terhadap package saat ini. Jadi
 
 ### 2. Mengapa `assertIn` lebih baik daripada `assertEqual` dalam testing?
 
+**Jawaban:**
+
 `assertIn` lebih baik karena:
 
 1. **Lebih Fleksibel:** `assertIn` hanya memeriksa apakah string tertentu ada dalam response, tidak harus sama persis
@@ -351,7 +392,7 @@ Titik (`.`) dalam `.views` berarti modul relatif terhadap package saat ini. Jadi
 3. **Lebih Fokus:** Kita hanya menguji konten penting, bukan format keseluruhan
 4. **Lebih Mudah:** Tidak perlu menyalin seluruh HTML response
 
-Contoh:
+**Contoh:**
 ```python
 # assertIn - lebih fleksibel
 self.assertIn(b'Visit', response.body)
@@ -364,8 +405,6 @@ self.assertEqual(response.body, b'<body>Visit <a href="/howdy">hello</a></body>'
 
 ### Error: ModuleNotFoundError: No module named 'tutorial.views'
 
-**Penyebab:** Modul `views.py` tidak ditemukan atau tidak dalam package yang benar.
-
 **Solusi:**
 - Pastikan file `tutorial/views.py` ada
 - Pastikan `tutorial/__init__.py` ada (untuk membuat `tutorial` menjadi package)
@@ -373,30 +412,23 @@ self.assertEqual(response.body, b'<body>Visit <a href="/howdy">hello</a></body>'
 
 ### Error: Route 'home' not found
 
-**Penyebab:** Route belum didaftarkan sebelum `config.scan()` dipanggil.
-
 **Solusi:**
 - Pastikan `config.add_route()` dipanggil sebelum `config.scan()`
 - Pastikan route name dalam `@view_config` sama dengan route name yang didaftarkan
 
 ### Error: View function not found
 
-**Penyebab:** View function tidak ditemukan atau decorator tidak benar.
-
 **Solusi:**
 - Pastikan `@view_config` decorator berada tepat di atas view function
 - Pastikan route name dalam decorator sesuai dengan route yang didaftarkan
 - Pastikan `config.scan('.views')` dipanggil setelah routes didaftarkan
 
-## Kesimpulan
+## Referensi
 
-Tutorial ini memperkenalkan konsep penting dalam Pyramid:
+- [Pyramid Documentation - Views](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/views.html)
+- [Pyramid Documentation - View Configuration](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/viewconfig.html)
+- [Pyramid Documentation - Config.scan()](https://docs.pylonsproject.org/projects/pyramid/en/latest/api/config.html#pyramid.config.Configurator.scan)
 
-1. **Memisahkan Views:** Views dapat dipisahkan ke modul terpisah
-2. **Konfigurasi Deklaratif:** Menggunakan `@view_config` decorator
-3. **Config.scan():** Menggunakan `config.scan()` untuk menemukan views
-4. **Multiple Views:** Membuat multiple views dengan routing yang berbeda
-5. **Testing:** Menguji multiple views dengan unit tests dan functional tests
+## Lisensi
 
-Konsep-konsep ini merupakan dasar untuk membangun aplikasi Pyramid yang lebih kompleks dan terorganisir dengan baik.
-
+Proyek ini dibuat untuk tujuan pembelajaran berdasarkan Pyramid Quick Tutorial.

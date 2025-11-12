@@ -327,7 +327,7 @@ Pastikan file konfigurasi production (misalnya `production.ini`) tidak memiliki 
 
 **Solusi:** Pastikan menggunakan flag `--reload` atau restart aplikasi secara manual
 
-## Extra Credit Questions
+## Extra Credit
 
 ### 1. Mengapa pyramid_debugtoolbar ditambahkan ke dev_requires, bukan requires?
 

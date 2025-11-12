@@ -235,6 +235,13 @@ Instalasi dalam development mode berarti:
 
 Di step-step berikutnya, kita akan belajar cara yang lebih baik untuk menjalankan aplikasi Pyramid.
 
+### Langkah Selanjutnya
+
+Setelah memahami step ini, Anda siap untuk:
+- **Step 03**: Application Configuration with .ini Files
+- Memahami bagaimana Pyramid menggunakan file konfigurasi
+- Belajar menggunakan `pserve` untuk menjalankan aplikasi
+
 ## Troubleshooting
 
 ### Error: `ModuleNotFoundError: No module named 'setuptools'`
@@ -272,12 +279,26 @@ serve(app, host='0.0.0.0', port=8080)  # Ganti dengan port lain
 pip install -e .
 ```
 
-## Langkah Selanjutnya
+## Extra Credit
 
-Setelah memahami step ini, Anda siap untuk:
-- **Step 03**: Application Configuration with .ini Files
-- Memahami bagaimana Pyramid menggunakan file konfigurasi
-- Belajar menggunakan `pserve` untuk menjalankan aplikasi
+### 1. Apakah `__init__.py` masih diperlukan di Python 3?
+
+**Jawaban:**
+
+Untuk Python 3.3+, `__init__.py` tidak selalu diperlukan untuk namespace packages, tetapi masih diperlukan untuk regular packages dan merupakan praktik yang baik untuk kompatibilitas.
+
+### 2. Apa perbedaan antara `pip install .` dan `pip install -e .`?
+
+**Jawaban:**
+
+- `pip install .`: Install package secara normal (copy ke site-packages)
+- `pip install -e .`: Install dalam editable mode (link ke source code)
+
+### 3. Bisakah saya menghapus direktori `tutorial/` setelah install?
+
+**Jawaban:**
+
+Tidak! Dengan `-e` (editable mode), Python masih membaca dari direktori sumber. Menghapusnya akan menyebabkan error.
 
 ## Referensi
 
@@ -286,23 +307,6 @@ Setelah memahami step ini, Anda siap untuk:
 - [Pyramid Documentation](https://docs.pylonsproject.org/projects/pyramid/en/latest/)
 - [PEP 420 - Implicit Namespace Packages](https://peps.python.org/pep-0420/)
 
-## FAQ
-
-### Q: Apakah `__init__.py` masih diperlukan di Python 3?
-
-**A:** Untuk Python 3.3+, `__init__.py` tidak selalu diperlukan untuk namespace packages, tetapi masih diperlukan untuk regular packages dan merupakan praktik yang baik untuk kompatibilitas.
-
-### Q: Apa perbedaan antara `pip install .` dan `pip install -e .`?
-
-**A:** 
-- `pip install .`: Install package secara normal (copy ke site-packages)
-- `pip install -e .`: Install dalam editable mode (link ke source code)
-
-### Q: Bisakah saya menghapus direktori `tutorial/` setelah install?
-
-**A:** Tidak! Dengan `-e` (editable mode), Python masih membaca dari direktori sumber. Menghapusnya akan menyebabkan error.
-
 ## Lisensi
 
-Proyek ini dibuat untuk tujuan pembelajaran.
-
+Proyek ini dibuat untuk tujuan pembelajaran berdasarkan Pyramid Quick Tutorial.

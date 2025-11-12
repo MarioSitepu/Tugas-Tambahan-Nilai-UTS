@@ -121,17 +121,20 @@ if __name__ == '__main__':
 - `config.make_wsgi_app()`: Membuat aplikasi WSGI
 - `serve(app, host='0.0.0.0', port=6543)`: Menjalankan server di host 0.0.0.0 (semua interface) pada port 6543
 
-## Konsep Penting
+## Analisis
 
 ### WSGI (Web Server Gateway Interface)
+
 WSGI adalah standar Python yang mendefinisikan interface antara web server dan aplikasi web Python. Ini memungkinkan aplikasi web Python untuk berjalan di berbagai server web.
 
 **WSGI** adalah singkatan dari "Web Server Gateway Interface". Standar ini dimodelkan setelah **CGI (Common Gateway Interface)**, yang merupakan standar web lama untuk menghubungkan server web dengan program eksternal.
 
 ### Configurator
+
 Configurator memainkan peran sentral dalam pengembangan Pyramid. Membangun aplikasi dari bagian-bagian yang loosely-coupled melalui Application Configuration adalah ide sentral dalam Pyramid.
 
 ### Request-Response Cycle
+
 1. Browser mengirim HTTP request ke server
 2. Server (waitress) menerima request
 3. WSGI application (Pyramid) memproses request
@@ -140,7 +143,7 @@ Configurator memainkan peran sentral dalam pengembangan Pyramid. Membangun aplik
 6. View function mengembalikan Response
 7. Response dikirim kembali ke browser
 
-## Extra Credit - Pertanyaan dan Eksperimen
+## Extra Credit
 
 ### 1. Mengapa menggunakan `print('Incoming request')` bukan `print 'Incoming request'`?
 
@@ -193,15 +196,6 @@ serve(app, host='0.0.0.0', port=8080)  # Ganti dengan port lain
 - Pastikan tidak ada firewall yang memblokir
 - Coba akses `http://127.0.0.1:6543/` sebagai alternatif
 
-## File Structure
-
-```
-01.Single-File-Web-Applications/
-├── app.py              # Aplikasi Pyramid single-file
-├── requirements.txt     # Dependencies yang diperlukan
-└── README.md           # Dokumentasi ini
-```
-
 ## Referensi
 
 - [Pyramid Documentation](https://docs.pylonsproject.org/projects/pyramid/en/latest/)
@@ -210,5 +204,4 @@ serve(app, host='0.0.0.0', port=8080)  # Ganti dengan port lain
 
 ## Lisensi
 
-Proyek ini dibuat untuk tujuan pembelajaran.
-
+Proyek ini dibuat untuk tujuan pembelajaran berdasarkan Pyramid Quick Tutorial.
